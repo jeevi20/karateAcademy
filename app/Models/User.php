@@ -19,8 +19,16 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'last_name',
+        'phone',
+        'address',
+        'gender',
+        'nic',
+        'dob',
         'email',
         'password',
+        'role_id',
+        'branch_id'
     ];
 
     /**
@@ -45,4 +53,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    //relationship with branches
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    //relationship with roles
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
 }
