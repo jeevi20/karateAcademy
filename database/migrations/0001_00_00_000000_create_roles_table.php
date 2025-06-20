@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->enum('role_name',['Admin','Branch Staff','Instructor','Student']);
+            $table->enum('role_name',['admin','branchstaff','instructor','student']);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

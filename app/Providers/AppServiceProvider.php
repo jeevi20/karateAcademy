@@ -1,8 +1,11 @@
 <?php
-
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View; 
+use App\Models\Branch;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,8 +20,12 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot()
     {
-        //
+        if (Schema::hasTable('branches')) {
+            View::share('branchCount', Branch::count());
+        }
     }
+
+    
 }

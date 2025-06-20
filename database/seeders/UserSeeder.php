@@ -14,18 +14,21 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Jeevana',
-            'last_name'=>'Jegatheeswaran',
-            'email' => 'jeevanajegatheeswaran@gmail.com',
-            'address'=>'Jaffna',
-            'role_id'=>'1', 
-            'phone'=>'0776639407',
-            'password'=>'12345678',
-            'nic'=>'200152001865',
-            'dob'=>'2001-01-20',
-            'gender'=>'F'
-            
-        ]);
+
+        if (!User::where('email', 'admin@example.com')->exists()) {
+            User::create([
+                'name' => 'Jeevana',
+                'last_name' => 'Jegatheeswaran',
+                'email' => 'jeevanajegatheeswaran@gmail.com',
+                'phone' => '1234567890',
+                'address' => 'Jaffna',
+                'gender' => 'F',
+                'dob' => '2000-01-20',
+                'nic' => '200152001865',
+                'role_id'=>'1', 
+                'password' => '12345678', 
+            ]);
+        }
+        
     }
 }

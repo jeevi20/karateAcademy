@@ -31,12 +31,28 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string', 'max:255'],
+            'phone' => ['required'],
+            'nic' => ['required'],
+            'dob' => ['required'],
+            'gender' => ['required'],
+            'role_id' => ['required'],
+            'branch_id' => ['required'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'last_name' => $request->last_name,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'nic' => $request->nic,
+            'dob' => $request->dob,
+            'gender' => $request->gender,
+            'role_id' => $request->role_id,
+            'branch_id' => $request->branch_id,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);

@@ -21,11 +21,14 @@ return new class extends Migration
             $table->string('address');
             $table->date('dob');
             $table->enum('gender',['M','F','Other']);
+
             $table->foreignId('role_id');
             $table->foreignId('branch_id')->nullable();
+            
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');

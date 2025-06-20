@@ -14,18 +14,23 @@ return new class extends Migration
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
             $table->string('branch_name');
+            $table->string('branch_code')->unique();
+            $table->string('province_code')->default('NP');
             $table->string('email')->unique();
             $table->string('branch_address');
             $table->string('phone_no');
+
+            $table->softDeletes();
             $table->timestamps();
+            
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-        Schema::dropIfExists('branches');
-    }
+        public function down(): void {
+            Schema::dropIfExists('branches');
+        } 
+    
 };

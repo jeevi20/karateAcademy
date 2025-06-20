@@ -65,7 +65,9 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'UTC'),
+    //'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'timezone' => 'Asia/Colombo', // Change by me for jobs
+
 
     /*
     |--------------------------------------------------------------------------
@@ -122,5 +124,9 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    //added by me for pdf
+    'Pdf' => Barryvdh\DomPDF\Facade\Pdf::class,
+
 
 ];
