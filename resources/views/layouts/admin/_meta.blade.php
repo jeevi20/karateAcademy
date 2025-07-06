@@ -4,4 +4,4 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title> Japanese Shotokan Karate Academy </title>
+    <title> Academy of Japanese Shotokan Karate International - Northen Province </title>

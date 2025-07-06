@@ -22,8 +22,12 @@ use App\Http\Controllers\StudentAttendanceController;
 use App\Http\Controllers\InstructorAttendanceController;
 use App\Http\Controllers\GradingExamController;
 use App\Http\Controllers\GradingExamResultController;
+use App\Http\Controllers\CertificationController;
 use App\Http\Controllers\AdmissionCardController;
-
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\BranchStaff\BranchStaffDashboardController;
+use App\Http\Controllers\Instructor\InstructorDashboardController;
+//use App\Http\Controllers\Student\StudentDashboardController;
 
 
 use Illuminate\Support\Facades\Route;
@@ -33,9 +37,28 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+    return view('dashboard');})->middleware(['auth'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/branchstaff/dashboard', [BranchStaffDashboardController::class, 'index'])
+         ->name('branchstaff_dashboard');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/instructor/dashboard', [InstructorDashboardController::class, 'index'])
+         ->name('instructor_dashboard');
+});
+
+// Route::middleware(['auth'])->group(function () {
+//     Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])
+//          ->name('student_dashboard');
+// });
+
+Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile');
+
+
+
 
 
 
@@ -52,6 +75,7 @@ Route::middleware('auth')->prefix('branches')->group(function () {
     Route::get('{id}/show', [BranchController::class, 'show'])->name('branch.show');
     Route::get('{branch}/edit', [BranchController::class, 'edit'])->name('branch.edit');
     Route::put('{branch}/update', [BranchController::class, 'update'])->name('branch.update');
+    Route::get('/branches/{id}/report', [BranchController::class, 'generateReport'])->name('branch.report');
     Route::delete('{branch}/destroy', [BranchController::class, 'destroy'])->name('branch.destroy');
 
 });
@@ -106,7 +130,13 @@ Route::middleware('auth')->prefix('students')->group(function () {
     Route::get('/{id}/edit', [StudentController::class, 'edit'])->name('student.edit');
     Route::put('/{id}', [StudentController::class, 'update'])->name('student.update');
     Route::delete('/{id}/destroy', [StudentController::class, 'destroy'])->name('student.destroy');
+
+    // Enrollment report routes
+    Route::get('/student/enrollment_report', [StudentController::class, 'showEnrollmentReport'])->name('student.enrollment_report');
+    Route::get('/student/enrollment_report/print', [StudentController::class, 'printEnrollmentReport'])->name('student.enrollment_report_print');
+    Route::get('/student/enrollment_report/pdf', [StudentController::class, 'downloadEnrollmentReportPDF'])->name('student.enrollment_report_pdf');
 });
+
 
 
 //Achievements
@@ -118,6 +148,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/student/{studentId}/achievement/{achievementId}/edit', [AchievementController::class, 'edit'])->name('achievement.edit');
     Route::put('/achievements/{id}', [AchievementController::class, 'update'])->name('achievement.update');
     Route::delete('/achievements/{id}', [AchievementController::class, 'destroy'])->name('achievement.destroy');
+
+    Route::get('/achievements/yearly_report/print', [AchievementController::class, 'yearlyAchievementReport'])->name('achievement.yearly_report_print');
 });
 
 Route::middleware('auth')->prefix('payments')->group(function () {
@@ -128,11 +160,18 @@ Route::middleware('auth')->prefix('payments')->group(function () {
     Route::put('/{id}', [PaymentController::class, 'update'])->name('payment.update');
     Route::get('/{id}', [PaymentController::class, 'show'])->name('payment.show');
     Route::get('/{id}/download-receipt', [PaymentController::class, 'downloadReceipt'])->name('payment.downloadReceipt');
+
+    // Route::get('/reports/annual-student-payments', [PaymentController::class, 'AnnualPaymentReport'])
+    // ->name('payment.annual_report');
+    // Route::get('/reports/annual-student-payments', [PaymentController::class, 'AnnualPaymentReportPrint'])
+    // ->name('payment.annual_report_print');
     
 });
 
 Route::middleware('auth')->prefix('salaries')->group(function () {
     Route::get('/', [SalaryController::class, 'index'])->name('salary.index');
+    Route::get('/salary/{id}/edit', [SalaryController::class, 'edit'])->name('salary.edit');
+    Route::put('/salary/{id}', [SalaryController::class, 'update'])->name('salary.update');
     
 });
 
@@ -173,9 +212,10 @@ Route::middleware('auth')->prefix('class_templates')->group(function () {
     Route::get('/', [KarateClassTemplateController::class, 'index'])->name('class_template.index');
     Route::get('/create', [KarateClassTemplateController::class, 'create'])->name('class_template.create');
     Route::post('/', [KarateClassTemplateController::class, 'store'])->name('class_template.store');
-    Route::get('/{id}/edit', [KarateClassTemplateController::class, 'edit'])->name('class_template.edit');
-    Route::put('/{id}', [KarateClassTemplateController::class, 'update'])->name('class_template.update');
-    Route::delete('/{id}/destroy', [KarateClassTemplateController::class, 'destroy'])->name('class_template.destroy');
+    Route::get('/{karateClassTemplate}/edit', [KarateClassTemplateController::class, 'edit'])->name('class_template.edit');
+    Route::put('/{karateClassTemplate}', [KarateClassTemplateController::class, 'update'])->name('class_template.update');
+    Route::delete('/{karateClassTemplate}/destroy', [KarateClassTemplateController::class, 'destroy'])->name('class_template.destroy');
+
     
 });
 
@@ -203,9 +243,17 @@ Route::middleware('auth')->prefix('attendances')->group(function () {
     Route::get('/get-students/{scheduleId}', [StudentAttendanceController::class, 'getStudents']);
     Route::get('/get-all-students-for-event/{eventId}', [StudentAttendanceController::class, 'getAllStudentsForEvent']);
 
+    //Report
+    Route::get('/attendance/student/monthly-report', [StudentAttendanceController::class, 'studentMonthlyReport'])->name('student_attendance.monthly_report');
+    Route::get('/student-attendance/monthly-report/print', [StudentAttendanceController::class, 'studentMonthlyReportPrint'])->name('student_attendance.monthly_report_print');
+
+
     Route::get('/instructor', [InstructorAttendanceController::class, 'index'])->name('instructor_attendance.index');
     Route::get('/instructor-attendance/create', [InstructorAttendanceController::class, 'create'])->name('instructor_attendance.create');
     Route::post('/instructor-attendance', [InstructorAttendanceController::class, 'store'])->name('instructor_attendance.store');
+    Route::get('/instructor-attendance/{id}/edit', [InstructorAttendanceController::class, 'edit'])->name('instructor_attendance.edit');
+    Route::put('/instructor-attendance/{id}', [InstructorAttendanceController::class, 'update'])->name('instructor_attendance.update');
+    Route::delete('/instructor-attendance/{id}/destroy', [InstructorAttendanceController::class, 'destroy'])->name('instructor_attendance.destroy');
     Route::get('/instructor-attendance/download', [InstructorAttendanceController::class, 'download'])->name('instructor_attendance.download');    
 
     // AJAX: Only for class attendance for Instructors
@@ -219,6 +267,7 @@ Route::prefix('grading-exams')->group(function () {
     Route::get('/', [GradingExamController::class, 'index'])->name('grading_exam.index');
     Route::get('/admissions', [GradingExamController::class, 'admission'])->name('grading_exam.admission');
 
+    Route::post('/grading_exam/release_all', [GradingExamController::class, 'releaseAll'])->name('grading_exam.releaseAll');
     Route::get('/admission-card/{exam}/{student}', [GradingExamController::class, 'viewAdmissionCard'])->name('grading_exam.admission_card.view');
     Route::get('/admission-card/download/{exam}/{student}', [GradingExamController::class, 'downloadAdmissionCard'])->name('grading_exam.admission_card.download');
 
@@ -229,9 +278,25 @@ Route::prefix('grading-exams')->group(function () {
     Route::get('/create', [GradingExamResultController::class, 'create'])->name('grading_exam_result.create');
     Route::post('/store', [GradingExamResultController::class, 'store'])->name('grading_exam_result.store');
     Route::get('/results/{result}/edit', [GradingExamResultController::class, 'edit'])->name('grading_exam_result.edit');
-    Route::put('/results/{result}', [GradingExamResultController::class, 'update'])->name('grading_exam_result.update');
-    Route::delete('/results/{result}', [GradingExamResultController::class, 'destroy'])->name('grading_exam_result.destroy');
+    Route::put('/results/{result}/update', [GradingExamResultController::class, 'update'])->name('grading_exam_result.update');
+    Route::delete('/results/{id}/destroy', [GradingExamResultController::class, 'destroy'])->name('grading_exam_result.destroy');
+    Route::post('/results/release', [GradingExamResultController::class, 'release'])->name('grading_exam_result.release');
+
+
+
+
 });
+
+
+Route::prefix('certifications')->group(function () {
+    Route::get('/', [CertificationController::class, 'index'])->name('certification.index');
+    Route::get('/create', [CertificationController::class, 'create'])->name('certification.create');
+    Route::post('/certification', [CertificationController::class, 'store'])->name('certification.store');
+    Route::get('/{certification}/download', [CertificationController::class, 'download'])->name('certification.download');
+});
+
+
+
 
 
 

@@ -49,7 +49,7 @@
         </div>
 
         <!-- By Event -->
-        <div class="col-md-4">
+        <!-- <div class="col-md-4">
             <div class="card shadow">
                 <div class="card-body">
                     <h5 class="text-center">By Event</h5>
@@ -65,11 +65,11 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <!-- Filter Form -->
-    <form id="attendanceFilterForm" action="{{ route('student_attendance.index') }}" method="GET" class="mb-4">
+    <!-- <form id="attendanceFilterForm" action="{{ route('student_attendance.index') }}" method="GET" class="mb-4">
         <div class="row align-items-end">
             <div class="col-md-3">
                 <label for="attendance_filter_type">Filter Type</label>
@@ -109,11 +109,11 @@
                 <button type="submit" class="btn btn-primary w-100">Filter</button>
             </div>
         </div>
-    </form>
+    </form> -->
 
     <!-- Create Button -->
     <div class="mb-3 text-end">
-        <a href="{{ route('student_attendance.create') }}" class="btn btn-success">
+        <a href="{{ route('student_attendance.create') }}" class="btn btn-primary">
             <i class="mdi mdi-plus-circle"></i> Record Attendance
         </a>
     </div>

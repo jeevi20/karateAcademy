@@ -74,23 +74,30 @@ $(document).ready(function () {
     }
 
     function loadStudents(students) {
-        let studentsHtml = '';
-        students.forEach(function (student) {
-            studentsHtml += `
-                <div class="form-check mb-2">
-                    <strong>${student.name}</strong><br>
+    let studentsHtml = '';
+    students.forEach(function (student) {
+        studentsHtml += `
+            <div class="form-check d-flex align-items-center mb-2">
+                <strong class="me-3" style="width: 150px;">${student.name}</strong>
+                <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="attendance[${student.id}]" value="present" id="present_${student.id}">
-                    <label class="form-check-label me-3" for="present_${student.id}">Present</label>
+                    <label class="form-check-label" for="present_${student.id}">Present</label>
+                </div>
+                <div class="form-check form-check-inline ms-3">
                     <input class="form-check-input" type="radio" name="attendance[${student.id}]" value="absent" id="absent_${student.id}">
-                    <label class="form-check-label me-3" for="absent_${student.id}">Absent</label>
+                    <label class="form-check-label" for="absent_${student.id}">Absent</label>
+                </div>
+                <div class="form-check form-check-inline ms-3">
                     <input class="form-check-input" type="radio" name="attendance[${student.id}]" value="late" id="late_${student.id}">
                     <label class="form-check-label" for="late_${student.id}">Late</label>
                 </div>
-            `;
-        });
-        $('#students-list').html(studentsHtml);
-        $('#student_attendance_div').show();
-    }
+            </div>
+        `;
+    });
+    $('#students-list').html(studentsHtml);
+    $('#student_attendance_div').show();
+}
+
 
     // Toggle sections based on attendance type
     $('input[name="attendance_type"]').change(function () {

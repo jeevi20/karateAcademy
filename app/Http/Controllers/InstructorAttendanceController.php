@@ -147,24 +147,55 @@ public function store(Request $request)
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(instructorAttendances $instructorAttendances)
-    {
-        //
-    }
+    
+public function edit($id)
+{
+    $attendance = InstructorAttendance::findOrFail($id);
+    $instructors = Instructor::all();
+    $karateClassTemplates = KarateClassTemplate::all();
+
+    $schedules = $attendance->schedule_id
+        ? Schedule::where('karate_class_template_id', $attendance->schedule->karate_class_template_id)->get()
+        : collect();
+
+    return view('instructor_attendance.edit', compact(
+        'attendance',
+        'instructors',
+        'karateClassTemplates',
+        'schedules'
+    ));
+}
+
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, instructorAttendances $instructorAttendances)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'status' => 'required|in:present,absent,late',
+            'date' => 'required|date',
+        ]);
+
+        $attendance = InstructorAttendance::findOrFail($id);
+        $attendance->update([
+            'status' => $request->status,
+            'date' => $request->date,
+        ]);
+
+        return redirect()->route('instructor_attendance.index')->with('success', 'Attendance updated successfully.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource.
      */
-    public function destroy(instructorAttendances $instructorAttendances)
+    public function destroy($id)
     {
-        //
+        $instructor_attendance = InstructorAttendance::findOrFail($id);
+        $instructor_attendance->delete();
+
+        return redirect()->route('instructor_attendance.index')->with('success', 'Attendance record deleted.');
     }
+    
 }

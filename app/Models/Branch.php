@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Branch extends Model
 {
+    protected $table = 'branches'; 
     use SoftDeletes;
 
     protected $fillable = [

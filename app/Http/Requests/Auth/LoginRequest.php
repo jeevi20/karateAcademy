@@ -33,14 +33,22 @@ class LoginRequest extends FormRequest
 
             $attempts = RateLimiter::attempts($this->throttleKey());
 
+            $userExists = \App\Models\User::where('email', $this->email)->exists();
+
+            if (! $userExists) {
+                throw ValidationException::withMessages([
+                    'email' => 'The email address you entered is not registered.',
+                ]);
+            }
+
             if ($attempts >= 3) {
                 throw ValidationException::withMessages([
-                    'email' => 'Too many failed login attempts. <a href="' . route('password.request') . '">Reset your password</a>.',
+                    'password' => 'Too many failed login attempts. <a href="' . route('password.request') . '">Reset your password</a>.',
                 ])->status(429);
             }
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed') . ' (' . $attempts . ' of 3 attempts)',
+                'password' => 'The password you entered is incorrect. (' . $attempts . ' of 3 attempts)',
             ]);
         }
 

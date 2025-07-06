@@ -47,6 +47,7 @@
         
            <!-- <a href="{{ route('branch.index') }}" class="btn btn-secondary">Back to Branch List</a> -->
            <button type="submit" class="btn btn-success mt-3">Create </button> 
+           <a href="{{ route('branch.index') }}" class="btn btn-secondary mt-3 ml-2">Cancel</a>
         
 
     </form>

@@ -21,6 +21,8 @@ return new class extends Migration
             $table->enum('past_experience', ['yes', 'no'])->default('no');
             $table->enum('status', ['Active', 'Inactive', 'Graduated', 'Suspended'])->default('Active');
             
+            $table->boolean('admission_granted')->default(false)->nullable();
+
 
             $table->timestamps();
             $table->softDeletes();

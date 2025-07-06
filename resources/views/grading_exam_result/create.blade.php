@@ -14,22 +14,23 @@
                     
                     <div class="form-group">
                         <label for="exam">Select Grading Exam:</label>
-                        <select name="examId" id="exam" class="form-control">
+                        <select name="examId" id="exam" class="form-control" required>
                             <option value="">Select Exam</option>
                             @foreach ($gradingExams as $exam)
-                                <option value="{{ $exam->id }}" {{ $examId == $exam->id ? 'selected' : '' }}>
+                                <option value="{{ $exam->id }}" {{ isset($examId) && $examId == $exam->id ? 'selected' : '' }}>
                                     {{ $exam->title }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
+
                     <div class="form-group">
                         <label for="student_id">Student</label>
                         <select name="student_id" class="form-control" required>
                             <option value="">Select Student</option>
                             @foreach ($students as $student)
-                                <option value="{{ $student->id }}">{{ $student->name ?? 'Unnamed Student' }}</option>
+                                <option value="{{ $student->id }}">{{ $student->name ?? '?' }}</option>
                             @endforeach
                         </select>
                     </div>

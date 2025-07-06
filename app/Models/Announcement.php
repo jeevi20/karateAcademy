@@ -17,7 +17,8 @@ class Announcement extends Model
         'image',
         'is_active',
         'audience',
-        'created_by'        
+        'created_by',
+        'link'        
     ];
 
     // Cast announcement_date to a Carbon instance for easy date handling

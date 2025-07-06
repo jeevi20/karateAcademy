@@ -4,10 +4,17 @@
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-        <h2>Achievements</h2>
-    </div>
+    <div class="card-header d-flex align-items-center justify-content-between">
+    <h2>Achievements</h2>
+    <!-- <form action="{{ route('achievement.yearly_report_print') }}" method="GET" class="d-flex align-items-center mb-0">
+        <label for="year" class="me-2 mb-0">Select Year:</label>
+        <input type="number" name="year" id="year" min="2000" max="{{ date('Y') }}" value="{{ request('year') }}" class="form-control me-2" style="width: 100px;" />
+        <button type="submit" class="btn btn-primary">Generate Report</button>
+    </form> -->
+</div>
+
     <div class="card-body">
+        
     <form method="GET" action="{{ route('achievement.index') }}" class="mb-3">
         <div class="row g-2">
             <div class="col-md-4">

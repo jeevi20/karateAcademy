@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('belt_want_to_receive')->nullable()->constrained('belts')->onDelete('cascade'); 
 
-            $table->enum('result', ['pass', 'fail'])->nullable();
+            $table->boolean('is_admission_released')->default(false);
             $table->string('review')->nullable(); 
             
             $table->timestamps();

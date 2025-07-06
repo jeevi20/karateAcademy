@@ -11,6 +11,9 @@
                 </div>
 
                 <div class="float-right">
+                    <a href="" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-chart-line"></i> Report
+                    </a>
                     <!-- Back to dashboard -->
                     <a href="{{ route('dashboard') }}" class="btn btn-dark">Back</a>
 
@@ -38,7 +41,7 @@
                             <th>Amount Received</th>
                             <th>Date Received</th>
                             <th>Student Name</th>
-                            <th>Branch</th>
+                            
                             <th>Recorded By</th>
                             <th>Actions</th>
                         </tr>   
@@ -53,7 +56,7 @@
                             <td>Rs. {{ number_format($payment->amount, 2) }}</td>
                             <td>{{ $payment->date_paid }}</td>
                             <td>{{ $payment->student->name }}</td> 
-                            <td>{{ $payment->student->branch->branch_name }}</td>
+                            
                             <td>{{ $payment->createdBy->name }}</td> 
                             <td>
                                 <!-- Show Button -->

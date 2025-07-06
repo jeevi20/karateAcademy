@@ -29,14 +29,24 @@ class GradingExamResult extends Model
         return $this->belongsTo(Event::class);
     }
 
-    public function student()
-    {
-        return $this->belongsTo(Student::class, 'student_id');
-    }
+    
 
-    public function instructor()
-    {
-        return $this->belongsTo(Instructor::class, 'instructor_id');
-    }
+public function student()
+{
+    return $this->belongsTo(User::class, 'student_id');
+}
+
+public function instructor()
+{
+    return $this->belongsTo(User::class, 'instructor_id');
+}
+
+ public function gradingExam()
+{
+    return $this->belongsTo(Event::class, 'event_id');
+}
+   
+
+    
 }
 

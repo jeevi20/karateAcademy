@@ -84,7 +84,7 @@
 
                     <!-- Nav Item - Certifications -->
                     <li class="nav-item">
-                        <a href="" class="nav-link">
+                        <a href="{{ route('certification.index') }}" class="nav-link">
                         <i class="fas fa-certificate"></i>
                             <span>Certifications</span>
                         </a>

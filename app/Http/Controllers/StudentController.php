@@ -10,19 +10,16 @@ use App\Models\Student;
 use App\Models\Belt;
 use App\Models\Trash;
 use App\Models\KarateClassTemplate;
-
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StudentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        
-            $students = User::with(['student.karateClassTemplate', 'student.achievements'])
+        $students = User::with(['student.karateClassTemplate', 'student.achievements'])
             ->where('role_id', 4)
             ->whereHas('student', function ($query) {
                 $query->whereNotNull('karate_class_template_id');
@@ -32,11 +29,6 @@ class StudentController extends Controller
         return view('student.index', compact('students'));
     }
 
-    
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $branches = Branch::all();
@@ -46,9 +38,6 @@ class StudentController extends Controller
         return view('student.create', compact('branches', 'belts', 'karateClasses'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -58,15 +47,16 @@ class StudentController extends Controller
             'dob' => 'required|date|before:today',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:10',
-            'nic' => 'nullable|string|max:12',
+            'phone' => ['required', 'string', 'regex:/^(?:0|\+94)(7\d{8})$/'],
             'address' => 'nullable|string|max:255',
             'branch_id' => 'required|exists:branches,id',
             'password' => 'nullable|min:6|required_if:nic,null',
 
             'karate_class_template_id' => 'required|exists:karate_class_templates,id',
-            'enrollment_date' => 'required|date',
+            'enrollment_date' =>  'required|date|before_or_equal:today',
             'status' => 'required|in:Active,Inactive,Graduated,Suspended',
             'past_experience' => 'required|in:yes,no',
+            'admission_granted'=> 'nullable',
 
             'achievement_type' => 'nullable|string|required_if:past_experience,yes',
             'achievement_name' => 'nullable|string|required_if:past_experience,yes',
@@ -74,6 +64,25 @@ class StudentController extends Controller
             'organization_name' => 'nullable|string|max:255',
             'remarks' => 'nullable|string|max:255',
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $nic = $request->input('nic');
+
+            if (preg_match('/^\d{9}[a-zA-Z]$/', $nic)) {
+                $lastChar = strtoupper(substr($nic, -1));
+                if (!in_array($lastChar, ['V', 'X'])) {
+                    $validator->errors()->add('nic', 'NIC must end with "V" or "X" for 9-digit NICs.');
+                }
+            } elseif (!preg_match('/^(\d{9}[vVxX]|\d{12})$/', $nic)) {
+                $validator->errors()->add('nic', 'The NIC format is invalid. Use 123456789V/X or 12-digit format.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $password = $request->nic ? Hash::make($request->nic) : Hash::make($request->password);
 
@@ -88,16 +97,18 @@ class StudentController extends Controller
             'address' => $request->address,
             'branch_id' => $request->branch_id,
             'password' => $password,
-            'role_id' => 4, 
+            'role_id' => 4,
         ]);
 
+        Mail::to($user->email)->send(new UserCreatedMail($user));
+
         $student = Student::create([
-            
             'user_id' => $user->id,
             'karate_class_template_id' => $request->karate_class_template_id,
             'enrollment_date' => $request->enrollment_date,
             'status' => $request->status,
             'past_experience' => $request->past_experience,
+            'admission_granted'=> $request->admission_granted,
         ]);
 
         if ($request->past_experience === 'yes') {
@@ -115,21 +126,14 @@ class StudentController extends Controller
         return redirect()->route('student.index')->with('success', 'Student created successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $student = User::with('student.karateClassTemplate', 'student.achievements')->findOrFail($id);
         return view('student.show', compact('student'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
-        
         $user = User::with('student')->findOrFail($id);
         $branches = Branch::all();
         $belts = Belt::all();
@@ -138,9 +142,6 @@ class StudentController extends Controller
         return view('student.edit', compact('user', 'branches', 'belts', 'karateClasses'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -152,15 +153,35 @@ class StudentController extends Controller
             'gender' => 'required|in:M,F,Other',
             'dob' => 'required|date|before:today',
             'email' => 'required|email|unique:users,email,' . $id,
-            'phone' => 'required|string|max:15',
+            'phone' => ['required', 'string', 'regex:/^(?:0|\+94)(7\d{8})$/'],
             'nic' => 'nullable|string|max:12',
             'address' => 'nullable|string|max:255',
             'branch_id' => 'required|exists:branches,id',
 
             'karate_class_template_id' => 'required|exists:karate_class_templates,id',
-            'enrollment_date' => 'required|date',
+            'enrollment_date' =>  'required|date|before_or_equal:today',
             'status' => 'required|in:Active,Inactive,Graduated,Suspended',
+            'admission_granted'=> 'nullable',
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $nic = $request->input('nic');
+
+            if (preg_match('/^\d{9}[a-zA-Z]$/', $nic)) {
+                $lastChar = strtoupper(substr($nic, -1));
+                if (!in_array($lastChar, ['V', 'X'])) {
+                    $validator->errors()->add('nic', 'NIC must end with "V" or "X" for 9-digit NICs.');
+                }
+            } elseif (!preg_match('/^(\d{9}[vVxX]|\d{12})$/', $nic)) {
+                $validator->errors()->add('nic', 'The NIC format is invalid. Use 123456789V/X or 12-digit format.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $user->update([
             'name' => $request->name,
@@ -179,44 +200,123 @@ class StudentController extends Controller
                 'karate_class_template_id' => $request->karate_class_template_id,
                 'enrollment_date' => $request->enrollment_date,
                 'status' => $request->status,
+                'admission_granted'=> $request->admission_granted,
             ]);
         }
 
         return redirect()->route('student.index')->with('success', 'Student details updated successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-
-        // Fetch student model
         $student = $user->student;
 
         if ($student) {
-            // Move achievements to trash first (if needed)
             $student->achievements()->delete();
-
-            // Store student record in trash
             Trash::storeDeletedRecord($student);
-
-            // Then delete student record
             $student->delete();
         }
 
-        // Store user record in trash (if needed, depending on your logic)
         Trash::storeDeletedRecord($user);
-
-        // Then delete user record
         $user->delete();
 
         return redirect()->route('student.index')->with('success', 'Student record and related achievements moved to trash successfully.');
     }
 
+    public function showEnrollmentReport(Request $request)
+{
+    $branches = Branch::all();
+    $belts = Belt::all();
 
+    $students = User::with(['student.karateClassTemplate', 'branch'])
+        ->where('role_id', 4)
+        ->when($request->branch_id, fn($q) => $q->where('branch_id', $request->branch_id))
+        ->when($request->belt_id, fn($q) => $q->whereHas('student', fn($q2) => $q2->where('belt_id', $request->belt_id)))
+        ->when($request->gender, fn($q) => $q->where('gender', $request->gender))
+        ->when($request->status, fn($q) => $q->whereHas('student', fn($q2) => $q2->where('status', $request->status)))
+        ->get();
 
+    if ($request->filled('month')) {
+        $month = Carbon::parse($request->month);
+        $students = $students->filter(function ($student) use ($month) {
+            return optional($student->student)->enrollment_date &&
+                Carbon::parse($student->student->enrollment_date)->isSameMonth($month);
+        });
+    }
+
+    return view('student.enrollment_report', compact('students', 'branches', 'belts'));
+}
+
+public function printEnrollmentReport(Request $request)
+{
+    $query = User::with(['student.karateClassTemplate', 'branch'])
+        ->where('role_id', 4);
+
+    if ($request->filled('branch_id')) {
+        $query->where('branch_id', $request->branch_id);
+    }
+
+    if ($request->filled('belt_id')) {
+        $query->whereHas('student', fn($q) => $q->where('belt_id', $request->belt_id));
+    }
+
+    if ($request->filled('gender')) {
+        $query->where('gender', $request->gender);
+    }
+
+    if ($request->filled('status')) {
+        $query->whereHas('student', fn($q) => $q->where('status', $request->status));
+    }
+
+    if ($request->filled('month')) {
+        $month = Carbon::parse($request->month);
+        $query->whereHas('student', fn($q) => 
+            $q->whereMonth('enrollment_date', $month->month)
+              ->whereYear('enrollment_date', $month->year)
+        );
+    }
+
+    $students = $query->get();
+    $month = $request->input('month');
+    return view('student.enrollment_report_print', compact('students', 'month'));
 
     
+}
+
+public function downloadEnrollmentReportPDF(Request $request)
+{
+    $query = User::with(['student.karateClassTemplate', 'branch'])
+        ->where('role_id', 4);
+
+    if ($request->filled('branch_id')) {
+        $query->where('branch_id', $request->branch_id);
+    }
+
+    if ($request->filled('belt_id')) {
+        $query->whereHas('student', fn($q) => $q->where('belt_id', $request->belt_id));
+    }
+
+    if ($request->filled('gender')) {
+        $query->where('gender', $request->gender);
+    }
+
+    if ($request->filled('status')) {
+        $query->whereHas('student', fn($q) => $q->where('status', $request->status));
+    }
+
+    if ($request->filled('month')) {
+        $month = Carbon::parse($request->month);
+        $query->whereHas('student', fn($q) => 
+            $q->whereYear('enrollment_date', $month->year)
+              ->whereMonth('enrollment_date', $month->month)
+        );
+    }
+
+    $students = $query->get();
+
+    $pdf = Pdf::loadView('student.enrollment_report_pdf', compact('students'));
+
+    return $pdf->download('enrollment_report.pdf');
+}
 }

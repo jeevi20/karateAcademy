@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Select Grading Exam</h1>
+    <h1 class="mb-4">Grading Exam Details</h1>
 
     <!-- Exam Dropdown -->
     <form method="GET" action="{{ route('grading_exam.detail') }}">

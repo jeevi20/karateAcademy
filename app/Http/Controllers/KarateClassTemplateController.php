@@ -52,7 +52,11 @@ class KarateClassTemplateController extends Controller
             'day' => 'required|string|max:255',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
+            ], 
+            [
+            'end_time.after' => 'The end time must be after the start time.',
         ]);
+        
 
         // Create the class template
         KarateClassTemplate::create([
@@ -73,7 +77,8 @@ class KarateClassTemplateController extends Controller
         $branches = Branch::all();
         $instructors = User::where('role_id', 3)->get();
 
-        return view('class_template.edit', compact('karateClassTemplate', 'branches', 'instructors'));
+       return view('class_template.edit', compact('karateClassTemplate', 'branches', 'instructors'));
+
     }
 
     /**
@@ -84,8 +89,10 @@ class KarateClassTemplateController extends Controller
         $request->validate([
         'class_name' => 'required|string|max:255',
         'day' => 'required|string|max:255',
-        'start_time' => 'required|date_format:H:i',
-        'end_time' => 'required|date_format:H:i|after:start_time',
+        'start_time' => 'required|date_format:H:i:s',
+        'end_time' => 'required|date_format:H:i:s|after:start_time',
+
+
         ]);
 
         $karateClassTemplate->update($request->all());

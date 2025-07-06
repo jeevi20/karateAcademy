@@ -66,7 +66,7 @@ class InstructorController extends Controller
         'gender' => 'required|in:M,F,Other',
         'dob' => 'required|date|before:today',
         'email' => 'required|email|unique:users,email',
-        'phone' => 'required|string|max:15',
+        'phone' => ['required', 'string', 'regex:/^(?:0|\+94)(7\d{8})$/'],
         'nic' => 'required|string|max:12',
         'address' => 'nullable|string|max:255',
         'branch_id' => 'required|exists:branches,id',
@@ -79,6 +79,25 @@ class InstructorController extends Controller
         'exp_in_karate' => 'required|integer',
         'exp_as_instructor' => 'required|integer|min:0',
     ]);
+
+     $validator->after(function ($validator) use ($request) {
+            $nic = $request->input('nic');
+
+            if (preg_match('/^\d{9}[a-zA-Z]$/', $nic)) {
+                $lastChar = strtoupper(substr($nic, -1));
+                if (!in_array($lastChar, ['V', 'X'])) {
+                    $validator->errors()->add('nic', 'NIC must end with "V" or "X" for 9-digit NICs.');
+                }
+            } elseif (!preg_match('/^(\d{9}[vVxX]|\d{12})$/', $nic)) {
+                $validator->errors()->add('nic', 'The NIC format is invalid. Use 123456789V/X or 12-digit format.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
        
         // Create the user record
         $user = User::create([
@@ -95,6 +114,8 @@ class InstructorController extends Controller
             'role_id' => 3,
 
         ]);
+
+        Mail::to($user->email)->send(new UserCreatedMail($user));
 
         //create instructor record
         Instructor::create([
@@ -147,7 +168,7 @@ class InstructorController extends Controller
             'gender' => 'required|in:M,F,Other',
             'dob' => 'required|date|before:today',
             'email' => 'required|email|unique:users,email,' . $id,
-            'phone' => 'required|string|max:15',
+            'phone' => ['required', 'string', 'regex:/^(?:0|\+94)(7\d{8})$/'],
             'nic' => 'required|string|max:12',
             'address' => 'nullable|string|max:255',
             'branch_id' => 'required|exists:branches,id',
@@ -160,6 +181,25 @@ class InstructorController extends Controller
             'exp_in_karate' => 'required|integer',
             'exp_as_instructor' => 'required|integer|min:0',
         ]);
+
+         $validator->after(function ($validator) use ($request) {
+            $nic = $request->input('nic');
+
+            if (preg_match('/^\d{9}[a-zA-Z]$/', $nic)) {
+                $lastChar = strtoupper(substr($nic, -1));
+                if (!in_array($lastChar, ['V', 'X'])) {
+                    $validator->errors()->add('nic', 'NIC must end with "V" or "X" for 9-digit NICs.');
+                }
+            } elseif (!preg_match('/^(\d{9}[vVxX]|\d{12})$/', $nic)) {
+                $validator->errors()->add('nic', 'The NIC format is invalid. Use 123456789V/X or 12-digit format.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         // Fetch user by id
         $user = User::findOrFail($id);
@@ -176,6 +216,8 @@ class InstructorController extends Controller
             'address' => $request->input('address'),
             'branch_id' => $request->input('branch_id'),
         ]);
+
+        
 
         // Update the instructor details
         $instructor = Instructor::where('user_id', $user->id)->first();

@@ -9,10 +9,17 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h2>Students</h2>
                 <div>
-                    <a href="{{ route('userlist.index') }}" class="btn btn-dark">Back</a>
-                    <a class="btn btn-primary btn-md btn-rounded" href="{{ route('student.create') }}">
-                        <i class="mdi mdi-plus-circle mdi-18px"></i> <i class="fas fa-plus" style="color:white"></i> Add
-                    </a>
+                    <div>
+                        <a href="{{ route('student.enrollment_report') }}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-chart-line"></i> Report
+                        </a>
+                        <a href="{{ route('userlist.index') }}" class="btn btn-dark me-2">Back</a>
+                        <a class="btn btn-primary btn-md btn-rounded" href="{{ route('student.create') }}">
+                            <i class="mdi mdi-plus-circle mdi-18px"></i> <i class="fas fa-plus" style="color:white"></i> Add
+                        </a>
+                    </div>
+
+                    
                 </div>
             </div>
 

@@ -35,7 +35,6 @@
                         <tr>
                             <th>Title</th>
                             <th>Body</th>
-                            <th>Date</th>
                             <th>Audience</th>
                             <th>Image</th>
                             <th style="width: 100px;">Action</th>
@@ -51,7 +50,6 @@
                             {{ $announcement->body }}
                             </div>
                         </td>
-                        <td>{{ $announcement->announcement_date }}</td>
                         <td>{{ ucfirst($announcement->audience) }}</td>
                         <td>
                             @if($announcement->image)

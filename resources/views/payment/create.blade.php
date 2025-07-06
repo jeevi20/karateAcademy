@@ -10,6 +10,16 @@
 
         <fieldset class="border p-4 mb-4">
 
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error) 
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
             <!-- Student Name Field -->
             <div class="form-group col-md-4">
                 <label for="student_id">Student Name</label>
@@ -71,7 +81,7 @@
 
             <!-- Date Paid Field -->
             <div class="form-group col-md-4">
-                <label for="date_paid">Date Paid</label>
+                <label for="date_paid">Paid Date</label>
                 <input type="date" name="date_paid" class="form-control rounded" id="date_paid" value="{{ old('date_paid') }}" required>
                 @error('date_paid') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
@@ -83,8 +93,15 @@
                 @error('notes') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
 
-            <button type="submit" class="btn btn-primary">Save Payment</button>
+            <div class="form-group d-flex align-items-center gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">Save Payment</button>
+                <a href="{{ route('payment.index') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+
+            
         </fieldset>
+
+        
     </form>
 
 </div>

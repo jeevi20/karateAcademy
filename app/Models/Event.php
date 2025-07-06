@@ -47,10 +47,12 @@ class Event extends Model
     return $this->hasMany(EventStudent::class);
 }
 
+
+
 public function students()
 {
     return $this->belongsToMany(User::class, 'event_student', 'event_id', 'student_id')
-                ->withPivot('belt_want_to_receive', 'result', 'review')
+                ->withPivot('belt_want_to_receive', 'review', 'is_admission_released')
                 ->withTimestamps();
 }
 

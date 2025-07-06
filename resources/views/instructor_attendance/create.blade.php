@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-4">Record Instructor Attendance (Class Only)</h1>
+    <h1 class="mb-4">Record Instructor Attendance</h1>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>

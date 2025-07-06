@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('announcement_date')->nullable();
             $table->string('image')->nullable(); 
             $table->boolean('is_active')->default(true);
+            $table->string('link')->nullable();
             $table->enum('audience', ['all', 'branchstaff', 'instructors', 'students'])->default('all'); 
 
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');

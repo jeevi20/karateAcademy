@@ -46,7 +46,7 @@ class AchievementController extends Controller
             'student_id' => 'required|exists:users,id',
             'achievement_type' => 'required|in:past_belt,academy_belt,medal,certificate,awards',
             'achievement_name' => 'required|string|max:255',
-            'achievement_date' => 'required|date',
+            'achievement_date' =>  'required|date|before_or_equal:today',
             'organization_name' => 'nullable|string|max:255',
             'remarks' => 'nullable|string|max:255',
         ]);
@@ -96,7 +96,7 @@ class AchievementController extends Controller
         $request->validate([
             'achievement_type' => 'required|in:past_belt,academy_belt,medal,certificate,awards',
             'achievement_name' => 'required|string|max:255',
-            'achievement_date' => 'required|date',
+            'achievement_date' =>  'required|date|before_or_equal:today',
             'organization_name' => 'nullable|string|max:255',
             'remarks' => 'nullable|string|max:255',
         ]);
@@ -123,6 +123,21 @@ class AchievementController extends Controller
 
     return redirect()->route('achievement.index', ['search' => $studentId])
         ->with('success', 'Achievement deleted successfully!');
+}
+
+
+public function yearlyAchievementReport(Request $request)
+{
+    $year = $request->input('year'); 
+
+    $query = Achievement::with('student', 'belt')
+        ->when($year, function ($q) use ($year) {
+            $q->whereYear('achievement_date', $year);
+        });
+
+    $achievements = $query->get();
+
+    return view('achievement.yearly_report_print', compact('achievements', 'year'));
 }
 
 

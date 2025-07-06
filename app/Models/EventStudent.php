@@ -14,7 +14,7 @@ class EventStudent extends Model
         'event_id',
         'student_id',
         'belt_want_to_receive',
-        'result',
+        'is_admission_released',
         'review',
     ];
 

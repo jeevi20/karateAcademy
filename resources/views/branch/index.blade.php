@@ -10,11 +10,11 @@
                 <div>
                     <!-- Back to Dashboard -->
                     <a href="{{ route('dashboard') }}" class="btn btn-dark">Back</a>
-
+                    
                     <!-- Add Branch Button -->
                     <a class="btn btn-primary btn-md btn-rounded" href="{{ route('branch.create') }}">
                         <i class="mdi mdi-plus-circle mdi-18px"></i> 
-                        <i class='fas fa-plus' style="color:white"></i>Add
+                        <i class='fas fa-plus' style="color:white"></i> Add
                     </a>
                 </div>
             </div>
@@ -31,9 +31,12 @@
                                 </div>
                                 <div class="card-body text-secondary text-center">
                                     <h4 class="card-title">Students - {{ $branch->students->count() }}</h4>
-                                    
-                                    <h4 class="card-title mt-3">Instructors - {{ $branch->instructors->count() }}</h5>
-                                    <h1></h1>
+                                    <h4 class="card-title mt-3">Instructors - {{ $branch->instructors->count() }}</h4>
+
+                                    <!-- Report Button -->
+                                    <a href="{{ route('branch.report', $branch->id) }}" class="btn btn-sm btn-primary mt-3">
+                                        <i class="fas fa-download"></i> Report
+                                    </a>
                                 </div>
                             </div>
                         </div>

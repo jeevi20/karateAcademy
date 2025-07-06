@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('schedule_id')->nullable()->constrained('schedules')->onDelete('cascade');
             $table->foreignId('recorded_by')->nullable()->constrained('users')->onDelete('cascade');
             
-            $table->enum('status', ['present', 'absent']);
+            $table->enum('status', ['present', 'absent', 'late']);
             $table->date('date');
             $table->timestamps();
             $table->softDeletes();

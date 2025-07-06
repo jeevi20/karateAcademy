@@ -33,6 +33,12 @@ class User extends Authenticatable
         return $this->belongsTo(Branch::class);
     }
 
+    public function scopeOfBranch($query, $branchId)
+{
+    return $query->where('branch_id', $branchId);
+}
+
+
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -49,6 +55,8 @@ class User extends Authenticatable
         return $this->hasOne(Student::class);
     }
     
+
+     
 
     public function payments()
     {
@@ -79,11 +87,18 @@ class User extends Authenticatable
     }
     
 
-    public function karateClassTemplate()
-    {
-        return $this->belongsTo(KarateClassTemplate::class); 
-    }
+    
+    public function karateClassTemplates()
+{
+    // assuming instructor has many classes assigned via instructor_id in karate_class_templates
+    return $this->hasMany(KarateClassTemplate::class, 'instructor_id', 'id');
+}
 
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_student', 'student_id', 'event_id');
+    }
 
     public function gradingExams()
     {

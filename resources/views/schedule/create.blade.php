@@ -19,7 +19,7 @@
                             <select name="karate_class_template_id" id="karate_class_template_id" class="form-control" required>
                                 <option value="" disabled selected>-- Select Class --</option>
                                 @foreach($karateClassTemplates as $template)
-                                    <option value="{{ $template->id }}">{{ $template->class_name }}</option>
+                                    <option value="{{ $template->id }}">{{ $template->class_name }} | {{ $template->start_time }} |{{ $template->day }}</option>
                                 @endforeach
                             </select>
                         </div>

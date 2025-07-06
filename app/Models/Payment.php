@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
+   
+
     protected $fillable = [
         'student_id',
         'created_by',
@@ -13,7 +15,9 @@ class Payment extends Model
         'payment_category',
         'amount',
         'date_paid',
+        'admission_card_path',
         'notes',
+        'belt_want_to_receive',
         'event_id'
     ];
 

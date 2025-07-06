@@ -13,7 +13,7 @@
             
                 <div class="float-right">
                 <!--Add Achievement Button Link -->                 
-                <!-- <a href="{{ route('salary.create', ['user_id' => $instructor->id]) }}" 
+                <!-- <a href="" 
                     class="btn btn-secondary btn-sm rounded-0"
                     data-toggle="tooltip" title="Add Salary"
                     style="background-color: #060b33;">

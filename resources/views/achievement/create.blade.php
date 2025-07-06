@@ -13,6 +13,16 @@
         @csrf
         <input type="hidden" name="student_id" value="{{ request()->route('studentId') }}">
 
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error) 
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <fieldset class="border p-4 mb-4">
             <!-- Achievement Type -->
             <div class="form-group col-md-4">

@@ -30,7 +30,7 @@
                 <table id="myTable" class="display">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
+                            <th>User ID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Phone</th>

@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
+use Carbon\Carbon;
 
 class Schedule extends Model
 {
@@ -60,6 +62,19 @@ class Schedule extends Model
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope('autoComplete', function (Builder $builder) {
+    //         $builder->with('karateClassTemplate')->get()->each(function ($schedule) {
+    //             if (
+    //                 $schedule->status === 'scheduled' &&
+    //                 Carbon::parse($schedule->schedule_date . ' ' . $schedule->karateClassTemplate->end_time)->isPast()
+    //             ) {
+    //                 $schedule->updateQuietly(['status' => 'completed']);
+    //             }
+    //         });
+    //     });
+    // }
 
     
     // Soft delete

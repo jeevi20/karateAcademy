@@ -5,9 +5,20 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h1>Attendances</h1>
+
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary me-2" type="button" id="reportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                       <i class="fas fa-chart-line"></i> Report
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="reportDropdown">
+                        <li><a class="dropdown-item" href="{{ route('student_attendance.monthly_report') }}">Student</a></li>
+                        <li><a class="dropdown-item" href="">Instructor</a></li>
+                    </ul>
+                </div>
             </div>
+
 
             <div class="row p-3">
                 <!-- Student Attendances Card -->

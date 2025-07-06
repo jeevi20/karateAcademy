@@ -17,7 +17,7 @@ class Student extends Model
         'user_id',
         'karate_class_template_id',
         'past_experience',
-        
+        'admission_granted'
 
     ];
 
@@ -29,11 +29,20 @@ class Student extends Model
         return $this->belongsToMany(Belt::class);
     }
 
+    public function belt()
+{
+    return $this->belongsTo(Belt::class, 'belt_id'); 
+}
 
-    public function user()
+   
+
+
+
+public function user()
 {
     return $this->belongsTo(User::class);
 }
+
 
 public function branch()
 {
@@ -59,10 +68,15 @@ public function branch()
         return $this->belongsTo(KarateClassTemplate::class, 'karate_class_template_id');
     }
 
-    public function events()
+   
+
+public function events()
 {
-    return $this->belongsToMany(Event::class, 'event_student', 'student_id', 'event_id');
+    return $this->belongsToMany(Event::class, 'event_student','student_id', 'event_id')
+        ->withPivot('is_admission_released')
+        ->withTimestamps();
 }
+
 
 
     public function gradingExamResults()
@@ -93,31 +107,26 @@ public function branch()
 
     
     public static function generateStudentRegNo()
-{
-    // Get the latest student record, excluding soft-deleted ones
-    $lastStudent = self::withTrashed()->orderBy('id', 'desc')->first();
+    {
+        // Get the latest student record, excluding soft-deleted ones
+        $lastStudent = self::withTrashed()->orderBy('id', 'desc')->first();
 
-    // Generate the new registration number based on the last student's reg number
-    if (!$lastStudent || !$lastStudent->student_reg_no) {
-        return 'S250001'; // Default start number if no records exist
-    }
-
-    $lastNumber = (int) substr($lastStudent->student_reg_no, 1);
-
-    // Try generating a unique number by checking for existing entries (excluding soft-deleted)
-    do {
-        $newRegNo = 'S' . str_pad($lastNumber + 1, 6, '0', STR_PAD_LEFT);
-        $exists = self::where('student_reg_no', $newRegNo)->whereNull('deleted_at')->exists();
-        
-        if (!$exists) {
-            break;
+        // Generate the new registration number based on the last student's reg number
+        if (!$lastStudent || !$lastStudent->student_reg_no) {
+            return 'S250001'; // Default start number if no records exist
         }
-
-        $lastNumber++; // Increment the number until a unique reg no is found
-    } while ($exists);
-
-    return $newRegNo;
-}
+        $lastNumber = (int) substr($lastStudent->student_reg_no, 1);
+        // Try generating a unique number by checking for existing entries (excluding soft-deleted)
+        do {
+            $newRegNo = 'S' . str_pad($lastNumber + 1, 6, '0', STR_PAD_LEFT);
+            $exists = self::where('student_reg_no', $newRegNo)->whereNull('deleted_at')->exists();
+            if (!$exists) {
+                break;
+            }
+            $lastNumber++; // Increment the number until a unique reg no is found
+        } while ($exists);
+        return $newRegNo;
+    }
 
     
     }

@@ -14,6 +14,9 @@
                     <!-- <input type="text" name="search" placeholder="Search..." value="#">
                     <button type="submit">Search</button> -->
 
+                    <a href="" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-chart-line"></i> Report
+                    </a>
                     <!-- back to user list -->
                     <a href="{{ route('userlist.index') }}" class="btn btn-dark" >Back</a>
 

@@ -32,11 +32,12 @@ class Achievement extends Model
     {
         return $this->student->user(); 
     }
+    
 
 
-    /**
-     * Relationship: Achievement belongs to a belt (optional)
-     */
+
+    //Relationship: Achievement belongs to a belt (optional)
+     
     public function belt()
     {
         return $this->belongsTo(Belt::class);

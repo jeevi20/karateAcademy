@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\StudentAttendance;
 use App\Models\KarateClassTemplate;
 use App\Models\Schedule;
 use App\Models\Event;
 use App\Models\User;
+use App\Models\Branch;
 use App\Models\Student;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
@@ -224,7 +225,129 @@ public function destroy($id)
     return redirect()->route('student_attendance.index')->with('success', 'Attendance record deleted.');
 }
 
+public function studentMonthlyReport(Request $request)
+{
+    $branches = Branch::all();
+    $classes = KarateClassTemplate::all();
+    $students = User::where('role_id', 4)->get();
+    
+    
 
+
+    if ($request->filled('branch_id')) {
+    $query->whereHas('student', fn($q) =>
+        $q->where('branch_id', $request->branch_id)
+    );
+    }
+    $query = StudentAttendance::with(['student.branch', 'schedule.karateClassTemplate']);
+
+
+    if ($request->filled('branch_id')) {
+        $query->whereHas('student.user', fn($q) =>
+            $q->where('branch_id', $request->branch_id)
+        );
+    }
+
+    if ($request->filled('class_id')) {
+        $query->whereHas('schedule', fn($q) =>
+            $q->where('karate_class_template_id', $request->class_id)
+        );
+    }
+
+    if ($request->filled('student_id')) {
+        $query->where('student_id', $request->student_id);
+    }
+
+    if ($request->filled('month')) {
+        $month = Carbon::parse($request->month);
+        $query->whereMonth('date', $month->month)
+              ->whereYear('date', $month->year);
+    }
+
+    $attendances = $query->get();
+
+    $summary = $attendances->groupBy('student_id')->map(function ($records) {
+        $total = $records->count();
+        $present = $records->where('status', 'present')->count();
+        $absent = $records->where('status', 'absent')->count();
+        $late = $records->where('status', 'late')->count();
+        $percentage = $total > 0 ? round(($present / $total) * 100, 2) : 0;
+
+        return [
+            
+            'student' => $records->first()->student->name ?? '',
+            'total' => $total,
+            
+            'present' => $present,
+            'absent' => $absent,
+            'late' => $late,
+            'percentage' => $percentage,
+        ];
+    });
+
+    return view('student_attendance.monthly_report', compact('summary', 'attendances', 'request','branches', 'classes', 'students', ));
+}
+
+public function studentMonthlyReportPrint(Request $request)
+{
+    $branches = Branch::all();
+    $classes = KarateClassTemplate::all();
+    $students = User::where('role_id', 4)->get();
+
+    // Parse the month from request or set null
+    if ($request->filled('month')) {
+        $month = Carbon::parse($request->month);
+        $formattedMonth = $month->format('F Y');
+    } else {
+        $month = null;
+        $formattedMonth = 'All Months';
+    }
+
+
+    $query = StudentAttendance::with(['student.branch', 'schedule.karateClassTemplate']);
+
+    if ($request->filled('branch_id')) {
+        $query->whereHas('student.user', fn($q) =>
+            $q->where('branch_id', $request->branch_id)
+        );
+    }
+
+    if ($request->filled('class_id')) {
+        $query->whereHas('schedule', fn($q) =>
+            $q->where('karate_class_template_id', $request->class_id)
+        );
+    }
+
+    if ($request->filled('student_id')) {
+        $query->where('student_id', $request->student_id);
+    }
+
+    if ($month) {
+        $query->whereMonth('date', $month->month)
+              ->whereYear('date', $month->year);
+    }
+
+    $attendances = $query->get();
+
+    $summary = $attendances->groupBy('student_id')->map(function ($records) use ($month) {
+        $total = $records->count();
+        $present = $records->where('status', 'present')->count();
+        $absent = $records->where('status', 'absent')->count();
+        $late = $records->where('status', 'late')->count();
+        $percentage = $total > 0 ? round(($present / $total) * 100, 2) : 0;
+
+        return [
+            'student' => $records->first()->student->name ?? '',
+            'total' => $total,
+            'present' => $present,
+            'absent' => $absent,
+            'late' => $late,
+            'percentage' => $percentage,
+        ];
+    });
+
+    return view('student_attendance.monthly_report_print', compact('summary', 'attendances', 'request', 'branches', 'classes', 'students', 'formattedMonth'));
+}
 
 
 

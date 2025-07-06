@@ -45,6 +45,7 @@ class AnnouncementController extends Controller
             'announcement_date' => 'required|date',
             'image' => 'nullable|image|mimes:jpg,png,jpeg',
             'is_active' => 'boolean',
+            'link' => 'nullable',
             'audience' => 'required|in:all,branchstaff,instructors,students',
         ]);
 

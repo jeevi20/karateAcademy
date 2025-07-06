@@ -36,7 +36,7 @@
                             <th> Event Type </th>
                             <th> Date </th>
                             <th> Location </th>
-                            <th> Status</th>
+                            
                             <th> Actions </th>
                         </tr>
                     </thead>
@@ -49,9 +49,7 @@
                             <td>{{ ucfirst($event->event_type) }}</td>
                             <td>{{ $event->event_date }}</td>
                             <td>{{ $event->location ?? 'N/A' }}</td>
-                            <td>
-                                
-                            </td>
+                           
 
                             <td>
                                 <!-- Show Button -->

@@ -22,6 +22,10 @@ return new class extends Migration
             $table->integer('amount');
             $table->date('date_paid');
             $table->text('notes')->nullable();
+
+            $table->foreignId('belt_want_to_receive')->nullable()->constrained('belts')->onDelete('set null');
+
+            $table->string('admission_card_path')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

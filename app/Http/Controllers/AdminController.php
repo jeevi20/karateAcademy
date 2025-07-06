@@ -36,11 +36,31 @@ class AdminController extends Controller
             'gender' => 'required|in:M,F,Other', 
             'dob' => 'required|date|before:today',
             'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:15',
+            'phone' => ['required', 'string', 'regex:/^(?:0|\+94)(7\d{8})$/'],
             'nic' => 'required|string|max:12',
             'address' => 'nullable|string|max:255',
             'password' => 'nullable|min:8',
+
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $nic = $request->input('nic');
+
+            if (preg_match('/^\d{9}[a-zA-Z]$/', $nic)) {
+                $lastChar = strtoupper(substr($nic, -1));
+                if (!in_array($lastChar, ['V', 'X'])) {
+                    $validator->errors()->add('nic', 'NIC must end with "V" or "X" for 9-digit NICs.');
+                }
+            } elseif (!preg_match('/^(\d{9}[vVxX]|\d{12})$/', $nic)) {
+                $validator->errors()->add('nic', 'The NIC format is invalid. Use 123456789V/X or 12-digit format.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
             // Create the user 
             User::create([
@@ -52,11 +72,13 @@ class AdminController extends Controller
                 'phone' => $request->input('phone'),
                 'nic' => $request->input('nic'),
                 'address' => $request->input('address'),
-                'password' => bcrypt($request->input('password')),  // Hash the password
-                'role_id' => 1, // role ID for students
+                'password' => bcrypt($request->input('password')), 
+                'role_id' => 1, 
             ]);
 
-            return redirect()->route('admin.index')->with('success', 'Admin created successfully!');
+            Mail::to($user->email)->send(new UserCreatedMail($user));
+
+            return redirect()->route('admin.index')->with('success', 'Admin created successfully, Mail Sent!');
         } 
 
     
@@ -83,11 +105,30 @@ class AdminController extends Controller
                 'last_name' => 'required|string|max:255',
                 'gender' => 'required|in:M,F,Other', 
                 'email' => 'required|email|unique:users,email,' . $id,
-                'phone' => 'required|string|max:15',
+                'phone' => ['required', 'string', 'regex:/^(?:0|\+94)(7\d{8})$/'],
                 'address' => 'nullable|string|max:255',
                 'dob' => 'nullable|date',
-                'nic' => 'nullable|string|max:20',
+                'nic' => 'required', 'string', 'max:12',
             ]);
+
+            $validator->after(function ($validator) use ($request) {
+            $nic = $request->input('nic');
+
+            if (preg_match('/^\d{9}[a-zA-Z]$/', $nic)) {
+                $lastChar = strtoupper(substr($nic, -1));
+                if (!in_array($lastChar, ['V', 'X'])) {
+                    $validator->errors()->add('nic', 'NIC must end with "V" or "X" for 9-digit NICs.');
+                }
+            } elseif (!preg_match('/^(\d{9}[vVxX]|\d{12})$/', $nic)) {
+                $validator->errors()->add('nic', 'The NIC format is invalid. Use 123456789V/X or 12-digit format.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
             // Retrieve admin by ID
             $admin = User::findOrFail($id);
@@ -102,7 +143,8 @@ class AdminController extends Controller
                 'gender' => $validated['gender'],
                 'dob' => $validated['dob'],
                 'nic' => $validated['nic'],
-                'password' => $validated['password'] ? bcrypt($validated['password']) : $admin->password,
+                'password' => $validated['password'] ?? null ? bcrypt($validated['password']): $admin->password,
+
             ]);
 
             return redirect()->route('admin.index')->with('success', 'Admin details updated successfully!');

@@ -52,7 +52,7 @@
     </div>
 
     <!-- Filter Form -->
-    <form id="attendanceFilterForm" action="{{ route('instructor_attendance.index') }}" method="GET" class="mb-4">
+    <!-- <form id="attendanceFilterForm" action="{{ route('instructor_attendance.index') }}" method="GET" class="mb-4">
         <div class="row align-items-end">
             <div class="col-md-3">
                 <label for="attendance_filter_type">Filter Type</label>
@@ -83,7 +83,7 @@
                 <button type="submit" class="btn btn-primary w-100">Filter</button>
             </div>
         </div>
-    </form>
+    </form> -->
 
     <!-- Create Button -->
     <div class="mb-3 text-end">
@@ -120,21 +120,26 @@
                             </td>
                             <td>{{ $attendance->schedule->schedule_date ?? '-' }}</td>
                             <td>
-                                <a href="" class="btn btn-success btn-sm">
+                                <a href="{{ route('instructor_attendance.edit', $attendance->id) }}" class="btn btn-success btn-sm">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <button onclick="confirmDelete()" class="btn btn-danger btn-sm">
-                                    <i class="fa fa-trash"></i>
+                                
+                                 <!-- Delete Button -->
+                                <button onclick="confirmDelete({{ $attendance->id }})" class="btn btn-danger btn-sm">
+                                <i class="fa fa-trash"></i>
                                 </button>
+
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+
             <form id="deleteForm" method="POST" style="display: none;">
                 @csrf
                 @method('DELETE')
             </form>
+
         </div>
     </div>
 </div>
@@ -205,7 +210,7 @@ $(document).ready(function () {
     });
 });
 
-function confirmDelete(id) {
+function confirmDelete(instructor_attendanceId) {
     Swal.fire({
         title: "Are you sure?",
         text: "This will delete this instructor attendance record.",
@@ -217,7 +222,7 @@ function confirmDelete(id) {
     }).then((result) => {
         if (result.isConfirmed) {
             let deleteForm = document.getElementById("deleteForm");
-            deleteForm.action = `/attendances/instructor_attendance/${id}/destroy`;
+            deleteForm.action = `{{ url('attendances/instructor-attendance') }}/${instructor_attendanceId}/destroy`;
             deleteForm.submit();
         }
     });
